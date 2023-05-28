@@ -12,6 +12,7 @@ safetensors==0.2.6
 # gradio==3.16.2
 # altair==4.2.2
 # easygui==0.98.3
+basicsr
 toml==0.10.2
 voluptuous==0.13.1
 # for BLIP captioning
