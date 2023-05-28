@@ -17,7 +17,6 @@ from . import util
 from .body import Body, BodyResult, Keypoint
 from .hand import Hand
 from .face import Face
-from modules import devices
 from annotator.annotator_path import models_path
 
 from typing import NamedTuple, Tuple, List, Callable, Union
@@ -108,7 +107,7 @@ class OpenposeDetector:
     model_dir = os.path.join(models_path, "openpose")
 
     def __init__(self):
-        self.device = devices.get_device_for("controlnet")
+        self.device = torch.device("cuda")
         self.body_estimation = None
         self.hand_estimation = None
         self.face_estimation = None
