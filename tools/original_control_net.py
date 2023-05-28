@@ -122,6 +122,8 @@ def load_preprocess(prep_type: str):
 
 
 def preprocess_ctrl_net_hint_image(image):
+  if len(image.shape)!=3:
+    image=cv2.cvtColor(image,cv2.COLOR_GRAY2RGB)
   image = np.array(image).astype(np.float32) / 255.0
   image = image[:, :, ::-1].copy()                         # rgb to bgr
   image = image[None].transpose(0, 3, 1, 2)       # nchw
