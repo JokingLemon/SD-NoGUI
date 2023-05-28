@@ -1,7 +1,5 @@
 import os
-from modules import shared
-
-models_path = shared.opts.data.get('control_net_modules_path', None)
+models_path = "/content/src/ControlNet/models"
 if not models_path:
     models_path = getattr(shared.cmd_opts, 'controlnet_annotator_models_path', None)
 if not models_path:
