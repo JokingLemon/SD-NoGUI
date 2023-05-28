@@ -42,8 +42,9 @@ def canny(img, res=512, thr_a=100, thr_b=200, **kwargs):
         from annotator.canny import apply_canny
         model_canny = apply_canny
     result = model_canny(img, l, h)
-    return remove_pad(result), True
-
+    result=remove_pad(result)
+    cv2.imwrite("/content/CNimg/canny.jpg",result)
+    return result
 
 def scribble_thr(img, res=512, **kwargs):
     img, remove_pad = resize_image_with_pad(img, res)
@@ -245,13 +246,15 @@ class OpenposeModel(object):
             from annotator.openpose import OpenposeDetector
             self.model_openpose = OpenposeDetector()
 
-        return remove_pad(self.model_openpose(
+        result= remove_pad(self.model_openpose(
             img,
             include_body=include_body,
             include_hand=include_hand,
             include_face=include_face,
             json_pose_callback=json_pose_callback
-        )), True
+        ))
+        cv.imwrite("/content/CNimg/Openpose.jpg",result)
+        return result
 
     def unload(self):
         if self.model_openpose is not None:
