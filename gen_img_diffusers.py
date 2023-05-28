@@ -93,7 +93,8 @@ from PIL.PngImagePlugin import PngInfo
 
 import src.model_util as model_util
 from src.networks.lora import LoRANetwork
-
+from src.tools import original_control_net
+from src.tools.original_control_net import ControlNetInfo
 from src.XTI_hijack import unet_forward_XTI, downblock_forward_XTI, upblock_forward_XTI
 
 # Tokenizer: checkpointから読み込むのではなくあらかじめ提供されているものを使う
@@ -2052,6 +2053,8 @@ def process_batch(batch,pipe,outdir,scheduler_num_noises_per_step,noise_manager,
                 if len(guide_images) == 1:
                     guide_images = guide_images[0]
 
+
+
             # generate
             if networks:
 
@@ -2803,6 +2806,7 @@ def main(args):
             guide_images = None
     else:
         guide_images = None
+
 
     # seed指定時はseedを決めておく
     if args.seed is not None:
