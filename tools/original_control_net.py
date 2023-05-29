@@ -220,7 +220,7 @@ def unet_forward(is_control_net, control_net: ControlNet, unet: UNet2DConditionM
   upsample_size = None
 
   if any(s % default_overall_up_factor != 0 for s in sample.shape[-2:]):
-    print("Forward upsample size to force interpolation output size.")
+    #print("Forward upsample size to force interpolation output size.")
     forward_upsample_size = True
 
   # 0. center input if necessary
