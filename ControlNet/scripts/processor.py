@@ -253,7 +253,7 @@ class OpenposeModel(object):
             include_face=include_face,
             json_pose_callback=json_pose_callback
         ))
-        cv.imwrite("/content/CNimg/Openpose.jpg",result)
+        cv2.imwrite("/content/CNimg/Openpose.jpg",result)
         return result
 
     def unload(self):
