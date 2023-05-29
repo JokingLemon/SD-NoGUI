@@ -122,6 +122,7 @@ def load_preprocess(prep_type: str):
 
 
 def preprocess_ctrl_net_hint_image(image):
+  image=np.array(image)
   if len(image.shape)!=3:
     image=cv2.cvtColor(image,cv2.COLOR_GRAY2RGB)
   image = np.array(image).astype(np.float32) / 255.0
@@ -133,20 +134,26 @@ def preprocess_ctrl_net_hint_image(image):
 
 def get_guided_hints(control_nets: List[ControlNetInfo], num_latent_input, b_size, hints):
   guided_hints = []
+  hints=[np.array(hint) for hint in hints]
   for i, cnet_info in enumerate(control_nets):
     # hintは 1枚目の画像のcnet1, 1枚目の画像のcnet2, 1枚目の画像のcnet3, 2枚目の画像のcnet1, 2枚目の画像のcnet2 ... と並んでいること
     b_hints = []
+
     if len(hints) == 1:           # すべて同じ画像をhintとして使う
       hint = hints[0]
       if cnet_info.prep is not None:
-        hint = cnet_info.prep(hint)
+        H_,W_,_=hint.shape
+        ress=min(H_,W_)
+        hint = cnet_info.prep(hint,res=ress)
       hint = preprocess_ctrl_net_hint_image(hint)
       b_hints = [hint for _ in range(b_size)]
     else:
       for bi in range(b_size):
         hint = hints[(bi * len(control_nets) + i) % len(hints)]
         if cnet_info.prep is not None:
-          hint = cnet_info.prep(hint)
+          H_, W_, _ = hint.shape
+          ress = min(H_, W_)
+          hint = cnet_info.prep(hint,res=ress)
         hint = preprocess_ctrl_net_hint_image(hint)
         b_hints.append(hint)
     b_hints = torch.cat(b_hints, dim=0)

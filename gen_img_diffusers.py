@@ -1913,7 +1913,7 @@ class TorchRandReplacer:
             return getattr(torch, item)
         raise AttributeError("'{}' object has no attribute '{}'".format(type(self).__name__, item))
 
-def process_batch(batch,pipe,outdir,scheduler_num_noises_per_step,noise_manager,device,networks=None,network_muls=None, control_nets=None, highres_fix=False, highres_1st=False):
+def process_batch(batch,pipe,outdir,scheduler_num_noises_per_step,noise_manager,device,networks=None,network_muls=None, control_nets=None,highres_fix_scale=2,highres_fix_steps=10 , highres_fix=False, highres_1st=False):
             batch_size = len(batch)
             dtype = torch.float16
             # highres_fixの処理
@@ -1922,27 +1922,27 @@ def process_batch(batch,pipe,outdir,scheduler_num_noises_per_step,noise_manager,
                 print("process 1st stage")
                 batch_1st = []
                 for _, base, ext in batch:
-                    width_1st = int(ext.width * args.highres_fix_scale + 0.5)
-                    height_1st = int(ext.height * args.highres_fix_scale + 0.5)
+                    width_1st = int(ext.width * highres_fix_scale + 0.5)
+                    height_1st = int(ext.height * highres_fix_scale + 0.5)
                     width_1st = width_1st - width_1st % 32
                     height_1st = height_1st - height_1st % 32
 
                     ext_1st = BatchDataExt(
                         width_1st,
                         height_1st,
-                        args.highres_fix_steps,
+                        highres_fix_steps,
                         ext.scale,
                         ext.negative_scale,
                         ext.strength,
                         ext.network_muls,
                         ext.num_sub_prompts,
                     )
-                    batch_1st.append(BatchData(args.highres_fix_latents_upscaling, base, ext_1st))
-                images_1st = process_batch(batch_1st, True, True)
+                    batch_1st.append(BatchData(True, base, ext_1st))
+                images_1st = process_batch(batch_1st,pipe,outdir,scheduler_num_noises_per_step,noise_manager,device,networks,network_muls, control_nets,highres_fix_scale,highres_fix_steps, highres_fix=True, highres_1st=True)
 
                 # 2nd stageのバッチを作成して以下処理する
                 print("process 2nd stage")
-                if args.highres_fix_latents_upscaling:
+                if True:
                     org_dtype = images_1st.dtype
                     if images_1st.dtype == torch.bfloat16:
                         images_1st = images_1st.to(torch.float)  # interpolateがbf16をサポートしていない
@@ -1953,7 +1953,7 @@ def process_batch(batch,pipe,outdir,scheduler_num_noises_per_step,noise_manager,
 
                 batch_2nd = []
                 for i, (bd, image) in enumerate(zip(batch, images_1st)):
-                    if not args.highres_fix_latents_upscaling:
+                    if not True:
                         image = image.resize((bd.ext.width, bd.ext.height), resample=PIL.Image.LANCZOS)  # img2imgとして設定
                     bd_2nd = BatchData(False, BatchDataBase(*bd.base[0:3], bd.base.seed + 1, image, None, *bd.base[6:]), bd.ext)
                     batch_2nd.append(bd_2nd)
@@ -2084,7 +2084,7 @@ def process_batch(batch,pipe,outdir,scheduler_num_noises_per_step,noise_manager,
                 clip_prompts=clip_prompts,
                 clip_guide_images=guide_images,
             )[0]
-            if highres_1st and not args.highres_fix_save_1st:  # return images or latents
+            if highres_1st and not False:  # return images or latents
                 return images
 
             # save image
@@ -3012,12 +3012,12 @@ def main(args):
                     ),
                 )
                 if len(batch_data) > 0 and batch_data[-1].ext != b1.ext:  # バッチ分割必要？
-                    process_batch(batch_data, highres_fix)
+                    process_batch(batch_data,outdir,scheduler_num_noises_per_step,noise_manager,device,networks,network_muls, control_nets,highres_fix)
                     batch_data.clear()
 
                 batch_data.append(b1)
                 if len(batch_data) == args.batch_size:
-                    prev_image = process_batch(batch_data, highres_fix)[0]
+                    prev_image = process_batch(batch_data,outdir,scheduler_num_noises_per_step,noise_manager,device,networks,network_muls, control_nets, highres_fix)[0]
                     batch_data.clear()
 
                 global_step += 1
@@ -3025,7 +3025,7 @@ def main(args):
             prompt_index += 1
 
         if len(batch_data) > 0:
-            process_batch(batch_data, highres_fix)
+            process_batch(batch_data,outdir,scheduler_num_noises_per_step,noise_manager,device,networks,network_muls, control_nets,  highres_fix)
             batch_data.clear()
 
     print("done!")
