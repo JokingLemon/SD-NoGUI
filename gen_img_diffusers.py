@@ -61,7 +61,7 @@ import math
 import os
 import random
 import re
-from diffuers.loaders import LoraLoaderMixin
+from diffusers.loaders import LoraLoaderMixin
 import diffusers
 import numpy as np
 import torch
