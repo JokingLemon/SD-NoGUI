@@ -61,7 +61,7 @@ import math
 import os
 import random
 import re
-
+from diffuers.loaders import LoraLoaderMixin
 import diffusers
 import numpy as np
 import torch
@@ -428,7 +428,7 @@ def replace_unet_cross_attn_to_xformers():
 # Pipelineだけ独立して使えないのと機能追加するのとでコピーして修正
 
 
-class PipelineLike:
+class PipelineLike(LoraLoaderMixin):
     r"""
     Pipeline for text-to-image generation using Stable Diffusion without tokens length limit, and support parsing
     weighting in prompt.
