@@ -593,10 +593,10 @@ def create_network_from_weights(multiplier, file, vae, text_encoder, unet, weigh
 
     module_class = LoRAInfModule if for_inference else LoRAModule
 
-    network = _(
+    network = LoRANetwork(
         text_encoder, unet, multiplier=multiplier, modules_dim=modules_dim, modules_alpha=modules_alpha, module_class=module_class
     )
-        return network, weights_sd
+    return network, weights_sd
 
 
 class LoRANetwork(torch.nn.Module):
@@ -747,8 +747,7 @@ class LoRANetwork(torch.nn.Module):
         else:
             weights_sd = torch.load(file, map_location="cpu")
 
-        info = self.
-        (weights_sd, False)
+        info = self.load_state_dict(weights_sd, False)
         return info
 
     def apply_to(self, text_encoder, unet, apply_text_encoder=True, apply_unet=True):
