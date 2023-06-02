@@ -468,7 +468,7 @@ def convert_ldm_vae_checkpoint(checkpoint, config):
     return new_checkpoint
 
 
-def create_unet_diffusers_config(v2):
+def create_unet_diffusers_config(v2,inpainting):
     """
     Creates a config for the diffusers based on the config of the LDM model.
     """
@@ -492,7 +492,7 @@ def create_unet_diffusers_config(v2):
 
     config = dict(
         sample_size=UNET_PARAMS_IMAGE_SIZE,
-        in_channels=UNET_PARAMS_IN_CHANNELS,
+        in_channels=9 if inpainting else UNET_PARAMS_IN_CHANNELS,
         out_channels=UNET_PARAMS_OUT_CHANNELS,
         down_block_types=tuple(down_block_types),
         up_block_types=tuple(up_block_types),
@@ -846,16 +846,16 @@ def load_checkpoint_with_text_encoder_conversion(ckpt_path, device="cpu"):
 
 
 # TODO dtype指定の動作が怪しいので確認する text_encoderを指定形式で作れるか未確認
-def load_models_from_stable_diffusion_checkpoint(v2, ckpt_path, device="cpu", dtype=None):
+def load_models_from_stable_diffusion_checkpoint(v2, ckpt_path, device="cpu", dtype=None,inpainting=False):
     _, state_dict = load_checkpoint_with_text_encoder_conversion(ckpt_path, device)
 
     # Convert the UNet2DConditionModel model.
-    unet_config = create_unet_diffusers_config(v2)
+    unet_config = create_unet_diffusers_config(v2,inpainting)
     converted_unet_checkpoint = convert_ldm_unet_checkpoint(v2, state_dict, unet_config)
 
     unet = UNet2DConditionModel(**unet_config).to(device)
-    info = unet.load_state_dict(converted_unet_checkpoint)
-    print("loading u-net:", info)
+    #info = unet.load_state_dict(converted_unet_checkpoint)
+    #print("loading u-net:", info)
 
     # Convert the VAE model.
     vae_config = create_vae_diffusers_config()

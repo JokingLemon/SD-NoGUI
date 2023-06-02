@@ -2025,7 +2025,7 @@ def process_batch(batch,pipe,outdir,scheduler_num_noises_per_step,noise_manager,
                             all_guide_images_are_same = guide_images[-2] is guide_image
 
                 # make start code
-                torch.manual_seed(seed)
+                _
                 start_code[i] = torch.randn(noise_shape, device=device, dtype=dtype)
 
                 # make each noises
