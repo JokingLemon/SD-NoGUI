@@ -468,7 +468,7 @@ def convert_ldm_vae_checkpoint(checkpoint, config):
     return new_checkpoint
 
 
-def create_unet_diffusers_config(v2,inpainting):
+def create_unet_diffusers_config(v2,inpainting=False):
     """
     Creates a config for the diffusers based on the config of the LDM model.
     """
