@@ -854,8 +854,8 @@ def load_models_from_stable_diffusion_checkpoint(v2, ckpt_path, device="cpu", dt
     converted_unet_checkpoint = convert_ldm_unet_checkpoint(v2, state_dict, unet_config)
 
     unet = UNet2DConditionModel(**unet_config).to(device)
-    #info = unet.load_state_dict(converted_unet_checkpoint)
-    #print("loading u-net:", info)
+    info = unet.load_state_dict(converted_unet_checkpoint)
+    print("loading u-net:", info)
 
     # Convert the VAE model.
     vae_config = create_vae_diffusers_config()
