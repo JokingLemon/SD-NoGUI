@@ -71,7 +71,7 @@ def tile_resample(img, res=512, thr_a=1.0, **kwargs):
     H = int(float(H) / float(thr_a))
     W = int(float(W) / float(thr_a))
     img = cv2.resize(img, (W, H), interpolation=cv2.INTER_AREA)
-    return img, True
+    return img
 
 
 def threshold(img, res=512, thr_a=127, **kwargs):
